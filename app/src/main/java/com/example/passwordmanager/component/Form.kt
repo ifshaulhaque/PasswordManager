@@ -20,12 +20,15 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun Form(
+    accountName: String = "",
+    userName: String = "",
+    password: String = "",
     buttonText: String,
     onClick: (String, String, String) -> Unit
 ) {
-    var accountName by remember { mutableStateOf("") }
-    var userName by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var accountName by remember { mutableStateOf(accountName) }
+    var userName by remember { mutableStateOf(userName) }
+    var password by remember { mutableStateOf(password) }
 
     Column (
         verticalArrangement = Arrangement.spacedBy(8.dp)

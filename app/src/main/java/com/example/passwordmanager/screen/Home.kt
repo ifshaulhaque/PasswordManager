@@ -133,7 +133,12 @@ fun HomeScreen(
                 sheetState = formSheetState
             ) {
                 Box(modifier = Modifier.padding(horizontal = 8.dp)) {
-                    Form(buttonText = formButtonText) { accountName, userName, password ->
+                    Form(
+                        accountName = if (formButtonText == updateButtonText) account?.accountName ?: "" else "",
+                        userName = if (formButtonText == updateButtonText) account?.username ?: "" else "",
+                        password = if (formButtonText == updateButtonText) account?.password ?: "" else "",
+                        buttonText = formButtonText
+                    ) { accountName, userName, password ->
                         if (formButtonText == addNewAccountButtonText) {
                             homeViewModel.insert(
                                 Account(
