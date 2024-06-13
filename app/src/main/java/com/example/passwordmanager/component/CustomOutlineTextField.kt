@@ -18,7 +18,7 @@ fun CustomTextField(
       onValueChange = onValueChange,
       modifier = Modifier
           .fillMaxWidth(),
-      placeholder = { Text(text = placeholder) },
+      label = { Text(text = placeholder) },
   )
 }
 

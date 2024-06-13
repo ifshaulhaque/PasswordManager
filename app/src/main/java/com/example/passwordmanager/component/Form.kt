@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -22,28 +23,34 @@ fun Form(
     buttonText: String,
     onClick: (String, String, String) -> Unit
 ) {
-    val accountName by remember { mutableStateOf("") }
-    val userName by remember { mutableStateOf("") }
-    val password by remember { mutableStateOf("") }
+    var accountName by remember { mutableStateOf("") }
+    var userName by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
     Column (
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         CustomTextField(
             value = accountName,
-            onValueChange = {},
+            onValueChange = {
+                accountName = it
+            },
             placeholder = stringResource(id = R.string.account_name)
         )
 
         CustomTextField(
-            value = accountName,
-            onValueChange = {},
+            value = userName,
+            onValueChange = {
+                userName = it
+            },
             placeholder = stringResource(id = R.string.user_name)
         )
 
         CustomTextField(
-            value = accountName,
-            onValueChange = {},
+            value = password,
+            onValueChange = {
+                password = it
+            },
             placeholder = stringResource(id = R.string.password)
         )
 
