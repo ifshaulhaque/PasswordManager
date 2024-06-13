@@ -9,4 +9,5 @@
     <string name="delete">Delete</string>
     <string name="add_new_account">Add New Account</string>
     <string name="update">Update</string>
+    <string name="required">*required</string>
 </resources>

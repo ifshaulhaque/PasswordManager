@@ -30,31 +30,43 @@ fun Form(
     var userName by remember { mutableStateOf(userName) }
     var password by remember { mutableStateOf(password) }
 
+    var accountNameError by remember { mutableStateOf<String?>(null) }
+    var usernameError by remember { mutableStateOf<String?>(null) }
+    var passwordError by remember { mutableStateOf<String?>(null) }
+
+    val requiredText = stringResource(id = R.string.required)
+
     Column (
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        CustomTextField(
+        CustomOutlineTextField(
             value = accountName,
             onValueChange = {
+                if (it.isNotEmpty()) accountNameError = null
                 accountName = it
             },
-            placeholder = stringResource(id = R.string.account_name)
+            placeholder = stringResource(id = R.string.account_name),
+            error = accountNameError
         )
 
-        CustomTextField(
+        CustomOutlineTextField(
             value = userName,
             onValueChange = {
+                if (it.isNotEmpty()) usernameError = null
                 userName = it
             },
-            placeholder = stringResource(id = R.string.user_name)
+            placeholder = stringResource(id = R.string.user_name),
+            error = usernameError
         )
 
-        CustomTextField(
+        CustomOutlineTextField(
             value = password,
             onValueChange = {
+                if (it.isNotEmpty()) passwordError = null
                 password = it
             },
-            placeholder = stringResource(id = R.string.password)
+            placeholder = stringResource(id = R.string.password),
+            error = passwordError
         )
 
         Button(
@@ -65,7 +77,13 @@ fun Form(
             modifier = Modifier
                 .fillMaxWidth(),
             onClick = {
-                onClick.invoke(accountName, userName, password)
+                if (accountName.isNotEmpty() && userName.isNotEmpty() && password.isNotEmpty()) {
+                    onClick.invoke(accountName, userName, password)
+                } else {
+                    accountNameError = if (accountName.isEmpty()) requiredText else null
+                    usernameError = if (userName.isEmpty()) requiredText else null
+                    passwordError = if (password.isEmpty()) requiredText else null
+                }
             }
         ) {
             Text(text = buttonText)
