@@ -2,9 +2,12 @@ package com.example.passwordmanager.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import com.example.passwordmanager.R
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -17,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,15 +29,27 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.passwordmanager.R
 import com.example.passwordmanager.component.Details
 import com.example.passwordmanager.component.Form
+import com.example.passwordmanager.component.PasswordManagerCard
+import com.example.passwordmanager.db.Account
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
-    val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
-    var showBottomSheet by remember { mutableStateOf(false) }
+fun HomeScreen(
+    homeViewModel: HomeViewModel = hiltViewModel()
+) {
+    val formSheetState = rememberModalBottomSheetState()
+    var showFormBottomSheet by remember { mutableStateOf(false) }
+    val detailSheetState = rememberModalBottomSheetState()
+    var showDetailBottomSheet by remember { mutableStateOf(false) }
+
+    var account by remember { mutableStateOf<Account?>(null) }
+    val addNewAccountButtonText = stringResource(id = R.string.add_new_account)
+    val updateButtonText = stringResource(id = R.string.update)
+    var formButtonText by remember { mutableStateOf(addNewAccountButtonText) }
 
     Scaffold(
         floatingActionButton = {
@@ -45,7 +59,8 @@ fun HomeScreen() {
                     .background(color = colorResource(id = R.color.blue_100))
                     .padding(16.dp)
                     .clickable {
-                        showBottomSheet = true
+                        formButtonText = addNewAccountButtonText
+                        showFormBottomSheet = true
                     }
             ) {
                 Icon(
@@ -62,17 +77,81 @@ fun HomeScreen() {
                 }
             )
         }
-    ) { _ ->
-        if (showBottomSheet) {
+    ) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().
+            padding(
+                top = innerPadding.calculateTopPadding() + 16.dp,
+                start = 16.dp,
+                end = 16.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(homeViewModel.allAccounts) { item: Account ->
+                PasswordManagerCard(
+                    account = item,
+                    onClick = {
+                        showFormBottomSheet = false
+                        account = it
+                        showDetailBottomSheet = true
+                    }
+                )
+            }
+        }
+
+        account?.let {
+            if (showDetailBottomSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showDetailBottomSheet = false},
+                    sheetState = detailSheetState
+                ) {
+                    Box(modifier = Modifier.padding(horizontal = 8.dp)) {
+                        Details(
+                            accountName = it.accountName,
+                            userName = it.username,
+                            password = it.password,
+                            onEdit = {
+                                showDetailBottomSheet = false
+                                formButtonText = updateButtonText
+                                showFormBottomSheet = true
+                            },
+                            onDelete = {
+                                homeViewModel.delete(it)
+                                showDetailBottomSheet = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        if (showFormBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = {
-                    showBottomSheet = false
+                    showFormBottomSheet = false
                 },
-                sheetState = sheetState
+                sheetState = formSheetState
             ) {
                 Box(modifier = Modifier.padding(horizontal = 8.dp)) {
-                    Form(buttonText = stringResource(id = R.string.add_new_account)) { accountName, userName, password ->
+                    Form(buttonText = formButtonText) { accountName, userName, password ->
+                        if (formButtonText == addNewAccountButtonText) {
+                            homeViewModel.insert(
+                                Account(
+                                    accountName = accountName,
+                                    username = userName,
+                                    password = password
+                                )
+                            )
+                        } else {
+                            account?.let {
+                                it.accountName = accountName
+                                it.username = userName
+                                it.password = password
+                                homeViewModel.update(it)
+                            }
+                        }
 
+                        showFormBottomSheet = false
                     }
                 }
             }

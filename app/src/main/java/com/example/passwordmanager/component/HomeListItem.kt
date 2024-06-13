@@ -2,6 +2,7 @@ package com.example.passwordmanager.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,10 +21,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.passwordmanager.R
+import com.example.passwordmanager.db.Account
 
 @Composable
 fun PasswordManagerCard(
-    name: String
+    account: Account,
+    onClick: (Account) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -35,12 +38,13 @@ fun PasswordManagerCard(
             )
             .clip(RoundedCornerShape(32.dp))
             .background(Color.White)
+            .clickable { onClick.invoke(account) }
             .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = name
+            text = account.accountName
         )
 
         Text(
@@ -60,5 +64,5 @@ fun PasswordManagerCard(
 @Preview
 @Composable
 private fun PasswordManagerCardPreview() {
-    PasswordManagerCard(name = "Google")
+    PasswordManagerCard(account = Account(accountName = "google", username = "", password = ""), onClick = {})
 }

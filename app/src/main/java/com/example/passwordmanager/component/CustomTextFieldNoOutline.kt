@@ -27,12 +27,15 @@ fun CustomTextFieldNoOutline(
   isPassword: Boolean = false
 ) {
   var passwordVisible by remember { mutableStateOf(false) }
-  val icon = if (passwordVisible) R.drawable.visibility else R.drawable.visible
+  val icon = if (passwordVisible) R.drawable.visible else R.drawable.visibility
 
   Column {
     Text(text = placeholder)
     Row {
-      Text(text = value, fontSize = 20.sp)
+      Text(
+        text = if (!isPassword || passwordVisible) value else "********",
+        fontSize = 20.sp
+      )
       Spacer(modifier = Modifier.fillMaxWidth().weight(1f))
       if (isPassword) {
         IconButton(
